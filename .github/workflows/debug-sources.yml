@@ -1,0 +1,45 @@
+name: Debug Recovery Sources
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    name: Probe recovery sources
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Probe Software Heritage / Wayback / Debian
+        run: |
+          echo "=== SH API: known Linux kernel initial commit (must exist) ==="
+          code=$(curl -sL --max-time 60 -o /tmp/linux.json -w '%{http_code}' "https://archive.softwareheritage.org/api/1/revision/1da177e4c3f41524e886b7f1b8a0c1fc7321cac2/")
+          echo "status: $code"
+          head -c 300 /tmp/linux.json; echo; echo
+          echo "=== SH API: our 8 pinned revisions ==="
+          for sha in e04662f5c54dca8031318dbe8cea5b0d18457d03 3da4d6a4e3e136451dc73476a74ab8f029f86114 1d03ea02503056badaa2a80d8be81e6d6084a82f dd76c9ab69bdf2151543023173be15f4d68d9cc3 7b005eafe00fc7171f5cd8a06e0ef26fef2e9d70 b8478a02bdc691fc0ea1ffb177dd141fe3a2c197 d11c12257ee89607b05fb738bfc33d3fce114d86 ad7d14241ab35f097220a2e4e41340749230822b; do
+            code=$(curl -sL --max-time 60 -o /tmp/r.json -w '%{http_code}' "https://archive.softwareheritage.org/api/1/revision/$sha/")
+            echo "$sha -> $code"
+            head -c 200 /tmp/r.json; echo
+            sleep 1
+          done
+          echo
+          echo "=== SH API: origin/get ==="
+          for repo in harmonoid/media_library harmonoid/tag_reader harmonoid/adaptive_layouts harmonoid/identity harmonoid/taglib harmonoid/smtc-win32 harmonoid/private alexmercerind/lastfm harmonoid/harmonoid; do
+            code=$(curl -sL --max-time 60 -o /tmp/o.json -w '%{http_code}' "https://archive.softwareheritage.org/api/1/origin/https://github.com/$repo/get/")
+            echo "$repo -> $code"
+            head -c 200 /tmp/o.json; echo
+            sleep 1
+          done
+          echo
+          echo "=== Wayback CDX ==="
+          for repo in harmonoid/media_library harmonoid/tag_reader harmonoid/adaptive_layouts harmonoid/identity harmonoid/taglib harmonoid/smtc-win32 harmonoid/private alexmercerind/lastfm; do
+            echo "-- $repo"
+            curl -sL --max-time 40 "http://web.archive.org/cdx/search/cdx?url=github.com/$repo&matchType=prefix&output=text&collapse=urlkey&limit=15" || echo "(cdx failed)"
+            sleep 1
+          done
+          echo
+          echo "=== sources.debian.org search ==="
+          curl -sL --max-time 40 -w '\nstatus:%{http_code}\n' "https://sources.debian.org/api/search/harmonoid/" | head -c 400
+          echo
+          echo "=== SH GraphQL probe ==="
+          curl -sL --max-time 40 -X POST "https://graphql.softwareheritage.org/" -H 'Content-Type: application/json' -d '{"query":"{ rateLimit { remaining } }"}' -w '\nstatus:%{http_code}\n' | head -c 300
