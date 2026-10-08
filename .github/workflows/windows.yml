@@ -11,6 +11,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Verify Vendored Dependencies
+        shell: bash
+        run: |
+          missing=0
+          for marker in \
+            external/adaptive_layouts/pubspec.yaml \
+            external/identity/pubspec.yaml \
+            external/lastfm/pubspec.yaml \
+            external/media_library/pubspec.yaml \
+            external/smtc-win32/smtc-win32.sln \
+            external/tag_reader/pubspec.yaml \
+            external/taglib/taglib/pubspec.yaml \
+            external/taglib/taglib_libs/pubspec.yaml \
+            assets/localizations/index.json; do
+            if [ ! -f "$marker" ]; then
+              echo "missing: $marker"
+              missing=1
+            fi
+          done
+          if [ -z "$(ls -A lib/private 2>/dev/null)" ]; then
+            echo "missing: lib/private contents"
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then
+            echo "::error::The external dependencies are not vendored in this repository."
+            echo "::error::The upstream harmonoid submodule repositories are PRIVATE; run the 'Vendor Dependencies' workflow first (requires an ACCESS_TOKEN secret with read access to the upstream private repositories)."
+            exit 1
+          fi
+
       - name: Enable Long Paths
         run: git config --system core.longpaths true
 
