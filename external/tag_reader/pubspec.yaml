@@ -1,0 +1,12 @@
+name: tag_reader
+description: >-
+  Audio tag reading for Harmonoid.
+  Community reimplementation (original private upstream package is unavailable).
+version: 1.0.0
+publish_to: "none"
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  pool: ^1.5.2

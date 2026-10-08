@@ -1,0 +1,117 @@
+[
+  {
+    "code": "en_US",
+    "name": "English",
+    "country": "United States"
+  },
+  {
+    "code": "ar",
+    "name": "العربية",
+    "country": "العالم"
+  },
+  {
+    "code": "de_DE",
+    "name": "Deutsch",
+    "country": "Deutschland"
+  },
+  {
+    "code": "el_GR",
+    "name": "Ελληνικά",
+    "country": "Ελλάδα"
+  },
+  {
+    "code": "es_ES",
+    "name": "Español",
+    "country": "España"
+  },
+  {
+    "code": "fa_IR",
+    "name": "فارسی",
+    "country": "ایران"
+  },
+  {
+    "code": "fr_FR",
+    "name": "Français",
+    "country": "France"
+  },
+  {
+    "code": "id_ID",
+    "name": "Bahasa Indonesia",
+    "country": "Indonesia"
+  },
+  {
+    "code": "it_IT",
+    "name": "Italiano",
+    "country": "Italia"
+  },
+  {
+    "code": "ja_JP",
+    "name": "日本語",
+    "country": "日本"
+  },
+  {
+    "code": "ko_KR",
+    "name": "한글",
+    "country": "Korea"
+  },
+  {
+    "code": "ku_KU",
+    "name": "Kurdî",
+    "country": "Kurdistan"
+  },
+  {
+    "code": "nl_NL",
+    "name": "Nederlands",
+    "country": "Nederland"
+  },    
+  {
+    "code": "pl_PL",
+    "name": "Polski",
+    "country": "Polska"
+  },
+  {
+    "code": "pt_BR",
+    "name": "Português",
+    "country": "Brasil"
+  },
+  {
+    "code": "ro_RO",
+    "name": "Română",
+    "country": "România"
+  },
+  {
+    "code": "ru_RU",
+    "name": "Русский",
+    "country": "Россия"
+  },
+  {
+    "code": "sl_SI",
+    "name": "Slovenščina",
+    "country": "Slovenija"
+  },
+  {
+    "code": "tok",
+    "name": "toki pona",
+    "country": "ma pona"
+  },
+  {
+    "code": "tr_TR",
+    "name": "Türkçe",
+    "country": "Türkiye"
+  },
+  {
+    "code": "vi_VN",
+    "name": "Tiếng Việt",
+    "country": "Việt Nam"
+  },
+  {
+    "code": "zh_CN",
+    "name": "简体中文",
+    "country": "中国"
+  },
+  {
+    "code": "zh_TW",
+    "name": "繁體中文",
+    "country": "臺灣"
+  }
+]

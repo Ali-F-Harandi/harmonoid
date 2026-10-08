@@ -1,0 +1,9 @@
+name: taglib
+description: >-
+  taglib FFI bindings for Harmonoid (tag WRITING).
+  Community reimplementation (original private upstream package is unavailable).
+version: 1.0.0
+publish_to: "none"
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
