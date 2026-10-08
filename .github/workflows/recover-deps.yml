@@ -1,0 +1,39 @@
+name: Recover Dependencies
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  recover:
+    name: Recover dependencies from Software Heritage
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Recover pinned submodule sources
+        run: python3 scripts/recover_external_deps.py
+
+      - name: Upload recovery snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: recovered-dependencies
+          path: |
+            external/
+            lib/private/
+            assets/localizations/
+
+      - name: Commit & push vendored dependencies
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm --cached external/smtc-win32 assets/localizations external/tag_reader external/adaptive_layouts external/media_library external/lastfm external/identity external/taglib lib/private
+          git rm .gitmodules
+          git add -A
+          git status --short | head -80
+          git commit -m "chore: vendor external dependencies (recovered from Software Heritage archive)"
+          git push origin HEAD:master

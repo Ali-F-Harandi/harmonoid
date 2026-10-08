@@ -1,0 +1,87 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows-x64:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Enable Long Paths
+        run: git config --system core.longpaths true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: "3.44.3"
+          cache: true
+
+      - name: Patch Flutter
+        run: |
+          $flutterRoot = Split-Path -Parent (Split-Path -Parent (Get-Command flutter).Source)
+          $file = Join-Path $flutterRoot "packages/flutter/lib/src/widgets/widget_state.dart"
+          $content = Get-Content $file -Raw
+          $content = $content.Replace("return kIsWeb ? SystemMouseCursors.click : SystemMouseCursors.basic;", "return SystemMouseCursors.click;")
+          Set-Content -Path $file -Value $content -NoNewline
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build SMTC DLL
+        run: |
+          cd external/smtc-win32
+          nuget restore smtc-win32.sln
+          msbuild smtc-win32.sln /p:Configuration=Release /p:Platform=x64
+          cd ../../
+          copy external/smtc-win32/x64/Release/smtc-win32.dll windows/bin/x64/
+
+      - name: Install Project Dependencies
+        run: flutter pub get
+
+      - name: Build
+        run: |
+          flutter build windows --release `
+            --dart-define=API_KEY=${{ secrets.API_KEY || '' }} `
+            --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL || '' }} `
+            --dart-define=LASTFM_API_KEY=${{ secrets.LASTFM_API_KEY || '' }} `
+            --dart-define=LASTFM_SHARED_SECRET=${{ secrets.LASTFM_SHARED_SECRET || '' }} `
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || '' }} `
+            --dart-define=SUPABASE_PUBLISHABLE_KEY=${{ secrets.SUPABASE_PUBLISHABLE_KEY || '' }} `
+            --dart-define=REVENUECAT_API_KEY=''
+
+      - name: Bundle Executable
+        run: |
+          cp -r build/windows/x64/runner/Release harmonoid-windows-x64-exe
+          tar.exe -a -c -f harmonoid-windows-x64-exe.zip harmonoid-windows-x64-exe
+
+      - name: Bundle Installer
+        run: |
+          "%programfiles(x86)%\Inno Setup 6\iscc.exe" "Harmonoid_InnoSetup_x64.iss"
+        shell: cmd
+
+      - name: Upload Artifact (Portable ZIP)
+        uses: actions/upload-artifact@v4
+        with:
+          name: harmonoid-windows-x64-exe
+          path: harmonoid-windows-x64-exe.zip
+
+      - name: Upload Artifact (Installer)
+        uses: actions/upload-artifact@v4
+        with:
+          name: harmonoid-windows-x64-setup
+          path: Output/harmonoid-windows-x64-setup.exe
+
+      - name: Upload Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: false
+          files: |
+            harmonoid-windows-x64-exe.zip
+            Output/harmonoid-windows-x64-setup.exe
