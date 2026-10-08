@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import '../enums.dart';
 import '../theme.dart';
 import 'context_menu_listener.dart';
-import 
 
 /// Callback fired when desktop table columns are resized.
 typedef DesktopOnColumnResize = void Function(List<double> widths);
